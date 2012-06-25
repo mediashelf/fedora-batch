@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with fedora-batch.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package com.yourmediashelf.fedora.batch;
 
 import java.util.ArrayList;
@@ -38,13 +39,9 @@ import org.fcrepo.server.storage.types.MIMETypedStream;
 import org.springframework.stereotype.Component;
 
 /**
- *
- * @author Edwin Shin
- */
-
-/**
  * <p>Rest controller for batch operations on Fedora's REST API.
  *
+ * @author Edwin Shin
  */
 @Path("/")
 @Component
@@ -54,23 +51,33 @@ public class BatchResource extends BaseRestResource implements Constants {
         super(server);
     }
 
+    /**
+     * <p>Get the datastream content denoted by dsids from the objects denoted by 
+     * pids.
+     * 
+     * @param pids The pids to query
+     * @param dsids The ids of the datastreams to fetch
+     * @return MultipartBody where each part corresponds to an individual 
+     * getDatastreamDissemination response.
+     */
     @Path("/getDatastreams")
     @Produces("multipart/mixed")
     @GET
     public MultipartBody getDatastreams(@QueryParam("pid")
     List<String> pids, @QueryParam("dsid")
     List<String> dsids) {
-        List<Attachment> atts = new ArrayList<Attachment>(pids.size() * dsids.size());
-        
+        List<Attachment> atts =
+                new ArrayList<Attachment>(pids.size() * dsids.size());
+
         Context context = getContext();
         MIMETypedStream mts = null;
-        
+
         for (String pid : pids) {
             for (String dsid : dsids) {
                 try {
                     mts =
-                            m_access.getDatastreamDissemination(context, pid, dsid,
-                                    null);
+                            m_access.getDatastreamDissemination(context, pid,
+                                    dsid, null);
                     atts.add(new Attachment(pid + "/" + dsid, mts.MIMEType, mts
                             .getStream()));
                 } catch (ServerException e) {
@@ -80,5 +87,4 @@ public class BatchResource extends BaseRestResource implements Constants {
         }
         return new MultipartBody(atts, true);
     }
-
 }
