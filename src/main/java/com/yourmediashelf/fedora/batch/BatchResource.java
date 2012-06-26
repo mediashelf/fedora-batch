@@ -55,7 +55,7 @@ public class BatchResource extends BaseRestResource implements Constants {
      * <p>Get the datastream content denoted by dsids from the objects denoted by 
      * pids.
      * 
-     * @param pids The pids to query
+     * @param pids The pids to query (e.g. "demo:1", "demo:2")
      * @param dsids The ids of the datastreams to fetch
      * @return MultipartBody where each part corresponds to an individual 
      * getDatastreamDissemination response.
