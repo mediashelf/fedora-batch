@@ -123,13 +123,6 @@ Building from source
         cd fedora-batch
         mvn install
         
-    fedora-batch ships with integration tests that require a running instance of 
-    Fedora that has the ResourceIndex module enabled. 
-    Set the testing properties (e.g. username, password) in pom.xml (or pass 
-    them in as arguments to Maven), or to skip the integration tests entirely:
-   
-        mvn install -DskipTests
-        
 
 License & Copyright
 -------------------
