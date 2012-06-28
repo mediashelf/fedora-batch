@@ -1,0 +1,203 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Fedora-batch by mediashelf</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Fedora-batch</h1>
+        <p>A batch controller for Fedora's REST API</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/mediashelf/fedora-batch" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/mediashelf/fedora-batch/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/mediashelf/fedora-batch/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>MediaShelf fedora-batch</h1>
+
+<p>A batch controller for Fedora's REST API.</p>
+
+<p>fedora-batch is a proof-of-concept implementation of a batch API for Fedora.</p>
+
+<p>Say, for example, you want to display the metadata for 10 different Fedora 
+objects on a web page. For the sake of example, let's assume we're working with 
+10 Fedora objects which each represent a video resource and that the metadata 
+we're interested in is contained in each object's DC datastream.</p>
+
+<p>Currently, you might tackle this by issuing 10 separate getDatastreamDissemination 
+requests to Fedora. However, what if you could just issue a single batch 
+request to Fedora and have Fedora assemble and return a single response?</p>
+
+<p>And because requirements always change, now imagine that you also need some 
+metadata that's only captured in the RELS-EXT datastream, so now instead of 10,
+you face 20 separate HTTP requests. But with the batch request, you just add 
+the second datastream ID parameter and the batch controller takes care of the rest.</p>
+
+<h2>Lies, Damn Lies, and Benchmarks</h2>
+
+<p><img src="https://github.com/mediashelf/fedora-batch/raw/master/src/site/resources/images/batchGetDatastreams-bench.png" alt="getDatastreams benchmark graph"></p>
+
+<p>In each of the tests above we are requesting 1 inline datastream and 1 managed datastream from 1, 10 or 20 objects (1x, 10x, 20x). The 10K, 100K, 1000K reflect the size (in KB) of the managed datastream (the inline datastream is the DC datastream, weighing in at less than 1KB). The batch* tests are using BatchGetDatastreams, the serial* tests are making one request per datastream per object.</p>
+
+<p>The timings measure a full roundtrip: request, response and reading out the response.</p>
+
+<p>The tests suggest a fairly marked performance benefit to using BatchGetDatastreams (2-4 times faster) over issuing a series of individual getDatastreamDissemination requests.</p>
+
+<h2>Usage</h2>
+
+<p>Sample request:</p>
+
+<pre><code>http://localhost:8080/fedora/batch/getDatastreams?pid=demo:1&amp;pid=demo:2&amp;dsid=DC
+</code></pre>
+
+<p>The request above fetches the DC datastreams from demo:1 and demo:2 objects, and 
+returns the result as a multipart/mixed message, e.g.:</p>
+
+<pre><code>--uuid:3d31e842-3291-44ca-ad66-43f6cea63f90
+Content-Type: text/xml
+Content-Transfer-Encoding: binary
+Content-ID: &lt;demo:1/DC&gt;
+
+
+&lt;oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+    xmlns:dc="http://purl.org/dc/elements/1.1/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"&gt;
+  &lt;dc:title&gt;Demo Object 1&lt;/dc:title&gt;
+  &lt;dc:identifier&gt;demo:1&lt;/dc:identifier&gt;
+&lt;/oai_dc:dc&gt;
+
+--uuid:3d31e842-3291-44ca-ad66-43f6cea63f90--
+Content-Type: text/xml
+Content-Transfer-Encoding: binary
+Content-ID: &lt;demo:2/DC&gt;
+
+
+&lt;oai_dc:dc xmlns:oai_dc="http://www.openarchives.org/OAI/2.0/oai_dc/" 
+    xmlns:dc="http://purl.org/dc/elements/1.1/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd"&gt;
+  &lt;dc:title&gt;Demo Object 2&lt;/dc:title&gt;
+  &lt;dc:identifier&gt;demo:2&lt;/dc:identifier&gt;
+&lt;/oai_dc:dc&gt;
+
+--uuid:0e61693c-18ea-4b53-912f-b4d15dd00283--
+</code></pre>
+
+<p>As of version 0.5, fedora-client provides basic support for BatchGetDatastreams:</p>
+
+<pre><code>BatchGetDatastreams req = new BatchGetDatastreams();
+BatchResponse res = req.pids("demo:1", "demo:2").dsids("DC").execute(fedora);
+for (BodyPart part : res.getBodyParts()) {
+  // do something...
+  System.out.println(part.getEntityAs(String.class);
+}
+</code></pre>
+
+<h2>Requirements</h2>
+
+<ul>
+<li>Fedora 3.6 (if you're interested in undertaking a backport for 3.5, contact me)</li>
+</ul><h2>Installation</h2>
+
+<p>Installation of fedora-batch requires updating the web.xml of the Fedora webapp, 
+copying a configuration file to FEDORA_HOME, and adding the fedora-batch jar to 
+the Fedora web app:</p>
+
+<ol>
+<li>
+<p>Edit your Fedora web.xml to include the following:</p>
+
+<pre><code>&lt;servlet&gt;
+  &lt;display-name&gt;CXF Batch Servlet&lt;/display-name&gt;
+  &lt;servlet-name&gt;CXFBatchServlet&lt;/servlet-name&gt;
+  &lt;servlet-class&gt;org.apache.cxf.transport.servlet.CXFServlet&lt;/servlet-class&gt;
+  &lt;init-param&gt;
+    &lt;param-name&gt;config-location&lt;/param-name&gt;
+    &lt;param-value&gt;file:${fedora.home}/server/config/spring/web/jaxrs/batch-jaxrs.xml&lt;/param-value&gt;
+  &lt;/init-param&gt;
+  &lt;load-on-startup&gt;3&lt;/load-on-startup&gt;
+&lt;/servlet&gt;
+
+&lt;servlet-mapping&gt;
+  &lt;servlet-name&gt;CXFBatchServlet&lt;/servlet-name&gt;
+  &lt;url-pattern&gt;/batch/*&lt;/url-pattern&gt;
+&lt;/servlet-mapping&gt;
+</code></pre>
+
+<p>(Tomcat users will find your web.xml in <code>$CATALINA_HOME/webapps/fedora/WEB-INF/web.xml</code>)</p>
+</li>
+<li><p>Copy batch-jaxrs.xml to <code>$FEDORA_HOME/server/config/spring/web/jaxrs/</code></p></li>
+<li>
+<p>Add <code>fedora-batch-NNN.jar</code> to your Fedora webapp.</p>
+
+<p>(Tomcat users can copy the fedora-batch jar to <code>$CATALINA_HOME/webapps/fedora/WEB-INF/lib</code>)</p>
+</li>
+</ol><h2>Building from source</h2>
+
+<ol>
+<li>
+<p>Download the source, e.g.</p>
+
+<pre><code>git clone git://github.com/mediashelf/fedora-batch.git
+</code></pre>
+</li>
+<li>
+<p>Build the project</p>
+
+<pre><code>cd fedora-batch
+mvn install
+</code></pre>
+</li>
+</ol><h2>License &amp; Copyright</h2>
+
+<p>fedora-batch is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.</p>
+
+<p>fedora-batch is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.</p>
+
+<p>You should have received a copy of the GNU Lesser General Public License
+along with fedora-client.  If not, see <a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>.</p>
+
+<p>Copyright © 2012 MediaShelf</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/mediashelf">mediashelf</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
