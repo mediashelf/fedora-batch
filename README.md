@@ -17,7 +17,7 @@ request to Fedora and have Fedora assemble and return a single response?
 And because requirements always change, now imagine that you also need some 
 metadata that's only captured in the RELS-EXT datastream, so now instead of 10,
 you face 20 separate HTTP requests. But with the batch request, you just add 
-the second datastream ID parameter and batch controller takes care of the rest.
+the second datastream ID parameter and the batch controller takes care of the rest.
 
 For complete documentation see: http://mediashelf.github.com/fedora-batch/
 
