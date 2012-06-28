@@ -20,7 +20,10 @@
 package com.yourmediashelf.fedora.batch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -50,22 +53,43 @@ public class BatchResource extends BaseRestResource implements Constants {
     public BatchResource(Server server) {
         super(server);
     }
-
+    
     /**
-     * <p>Get the datastream content denoted by dsids from the objects denoted by 
-     * pids.
+     * <p>Get the datastream content denoted by dsids from the objects denoted.
      * 
-     * @param pids The pids to query (e.g. "demo:1", "demo:2")
-     * @param dsids The ids of the datastreams to fetch
-     * @return MultipartBody where each part corresponds to an individual 
-     * getDatastreamDissemination response.
+     * @param pidList a List of pids (pidList will be union'ed with pidsCSV)
+     * @param dsidList a List of datastream ids (dsidList will be union'ed with dsidsCSV)
+     * @param pidsCsv a comma-separated list of pids
+     * @param dsidsCsv a comma-separated list of datastream ids
+     * @return a multipart/mixed response
      */
     @Path("/getDatastreams")
     @Produces("multipart/mixed")
     @GET
-    public MultipartBody getDatastreams(@QueryParam("pid")
-    List<String> pids, @QueryParam("dsid")
-    List<String> dsids) {
+    public MultipartBody getDatastreams(
+            @QueryParam("pid") List<String> pidList, 
+            @QueryParam("dsid") List<String> dsidList,
+            @QueryParam("pids") String pidsCsv, 
+            @QueryParam("dsids") String dsidsCsv) {
+        
+        Set<String> pids = new HashSet<String>();
+        Set<String> dsids = new HashSet<String>();
+        if (pidList != null) {
+            pids.addAll(pidList);
+        }
+        if (pidsCsv != null && !pidsCsv.trim().isEmpty()) {
+            pids.addAll(Arrays.asList(pidsCsv.split(",")));
+        }
+        if (dsidList != null) {
+            dsids.addAll(dsidList);
+        }
+        if (dsidsCsv != null && !dsidsCsv.trim().isEmpty()) {
+            dsids.addAll(Arrays.asList(dsidsCsv.split(",")));
+        }
+        return getDatastreams(pids, dsids);
+    }
+    
+    public MultipartBody getDatastreams(Set<String> pids, Set<String> dsids) {
         List<Attachment> atts =
                 new ArrayList<Attachment>(pids.size() * dsids.size());
 
@@ -77,7 +101,7 @@ public class BatchResource extends BaseRestResource implements Constants {
                 try {
                     mts =
                             m_access.getDatastreamDissemination(context, pid,
-                                    dsid, null);
+                                    dsid, null);                    
                     atts.add(new Attachment(pid + "/" + dsid, mts.MIMEType, mts
                             .getStream()));
                 } catch (ServerException e) {
