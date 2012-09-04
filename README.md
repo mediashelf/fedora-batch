@@ -91,8 +91,8 @@ However, manual installation of fedora-batch for Servlet 3.x containers is trivi
 
     (Tomcat users can copy the fedora-batch jar to `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`)
 
-Manual installation for Servlet 2.x containers (e.g Tomcat 6.x) adds just one 
-additional step (e.g. Tomcat 6.x) of updating the web.xml of the Fedora webapp:
+    Manual installation for Servlet 2.x containers (e.g Tomcat 6.x) adds just one 
+    additional step (e.g. Tomcat 6.x) of updating the web.xml of the Fedora webapp:
 
 2. Edit your Fedora web.xml to include the following:
 
