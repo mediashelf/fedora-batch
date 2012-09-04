@@ -62,7 +62,7 @@
     <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
     <init-param>
       <param-name>config-location</param-name>
-      <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/batch-jaxrs.xml</param-value>
+      <param-value>classpath:batch-jaxrs.xml</param-value>
     </init-param>
     <load-on-startup>3</load-on-startup>
   </servlet>

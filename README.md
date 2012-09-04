@@ -82,11 +82,19 @@ Requirements
 Installation
 ------------
 
-Installation of fedora-batch requires updating the web.xml of the Fedora webapp, 
-copying a configuration file to FEDORA_HOME, and adding the fedora-batch jar to 
-the Fedora web app:
+fedora-batch-webapp-NNN.war is a drop-in replacement for fedora.war but requires
+a Servlet 3.0 container (e.g. Tomcat 7.x).
 
-1. Edit your Fedora web.xml to include the following:
+However, manual installation of fedora-batch for Servlet 3.x containers is trivial:
+
+1. Add `fedora-batch-core-NNN.jar` to your Fedora webapp.
+
+    (Tomcat users can copy the fedora-batch jar to `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`)
+
+Manual installation for Servlet 2.x containers (e.g Tomcat 6.x) adds just one 
+additional step (e.g. Tomcat 6.x) of updating the web.xml of the Fedora webapp:
+
+2. Edit your Fedora web.xml to include the following:
 
         <servlet>
           <display-name>CXF Batch Servlet</display-name>
@@ -94,7 +102,7 @@ the Fedora web app:
           <servlet-class>org.apache.cxf.transport.servlet.CXFServlet</servlet-class>
           <init-param>
             <param-name>config-location</param-name>
-            <param-value>file:${fedora.home}/server/config/spring/web/jaxrs/batch-jaxrs.xml</param-value>
+            <param-value>classpath:batch-jaxrs.xml</param-value>
           </init-param>
           <load-on-startup>3</load-on-startup>
         </servlet>
@@ -105,11 +113,6 @@ the Fedora web app:
         </servlet-mapping>
 
     (Tomcat users will find your web.xml in `$CATALINA_HOME/webapps/fedora/WEB-INF/web.xml`)
-
-2. Copy batch-jaxrs.xml to `$FEDORA_HOME/server/config/spring/web/jaxrs/`
-3. Add `fedora-batch-NNN.jar` to your Fedora webapp.
-
-    (Tomcat users can copy the fedora-batch jar to `$CATALINA_HOME/webapps/fedora/WEB-INF/lib`)
 
 Building from source
 --------------------
