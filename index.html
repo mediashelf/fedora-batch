@@ -1,44 +1,36 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Fedora-batch by mediashelf</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Fedora-batch : A batch controller for Fedora's REST API" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Fedora-batch</title>
   </head>
+
   <body>
 
-      <header>
-        <h1>Fedora-batch</h1>
-        <p>A batch controller for Fedora's REST API</p>
-      </header>
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/mediashelf/fedora-batch">View on GitHub</a>
 
-      <div id="banner">
-        <span id="logo"></span>
+          <h1 id="project_title">Fedora-batch</h1>
+          <h2 id="project_tagline">A batch controller for Fedora's REST API</h2>
 
-        <a href="https://github.com/mediashelf/fedora-batch" class="button fork"><strong>View On GitHub</strong></a>
-        <div class="downloads">
-          <span>Downloads:</span>
-          <ul>
-            <li><a href="https://github.com/mediashelf/fedora-batch/zipball/master" class="button">ZIP</a></li>
-            <li><a href="https://github.com/mediashelf/fedora-batch/tarball/master" class="button">TAR</a></li>
-          </ul>
-        </div>
-      </div><!-- end banner -->
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/mediashelf/fedora-batch/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/mediashelf/fedora-batch/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
 
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
         <h1>MediaShelf fedora-batch</h1>
 
 <p>A batch controller for Fedora's REST API.</p>
@@ -126,9 +118,19 @@ for (BodyPart part : res.getBodyParts()) {
 <li>Fedora 3.6 (if you're interested in undertaking a backport for 3.5, contact me)</li>
 </ul><h2>Installation</h2>
 
-<p>Installation of fedora-batch requires updating the web.xml of the Fedora webapp, 
-copying a configuration file to FEDORA_HOME, and adding the fedora-batch jar to 
-the Fedora web app:</p>
+<p>fedora-batch-webapp-NNN.war is a drop-in replacement for fedora.war but requires
+a Servlet 3.0 container (e.g. Tomcat 7.x).</p>
+
+<p>However, manual installation of fedora-batch for Servlet 3.x containers is trivial:</p>
+
+<ol>
+<li>
+<p>Add <code>fedora-batch-core-NNN.jar</code> to your Fedora webapp.</p>
+
+<p>(Tomcat users can copy the fedora-batch jar to <code>$CATALINA_HOME/webapps/fedora/WEB-INF/lib</code>)</p>
+</li>
+</ol><p>Manual installation for Servlet 2.x containers (e.g Tomcat 6.x) adds just one 
+additional step (e.g. Tomcat 6.x) of updating the web.xml of the Fedora webapp:</p>
 
 <ol>
 <li>
@@ -140,7 +142,7 @@ the Fedora web app:</p>
   &lt;servlet-class&gt;org.apache.cxf.transport.servlet.CXFServlet&lt;/servlet-class&gt;
   &lt;init-param&gt;
     &lt;param-name&gt;config-location&lt;/param-name&gt;
-    &lt;param-value&gt;file:${fedora.home}/server/config/spring/web/jaxrs/batch-jaxrs.xml&lt;/param-value&gt;
+    &lt;param-value&gt;classpath:batch-jaxrs.xml&lt;/param-value&gt;
   &lt;/init-param&gt;
   &lt;load-on-startup&gt;3&lt;/load-on-startup&gt;
 &lt;/servlet&gt;
@@ -152,12 +154,6 @@ the Fedora web app:</p>
 </code></pre>
 
 <p>(Tomcat users will find your web.xml in <code>$CATALINA_HOME/webapps/fedora/WEB-INF/web.xml</code>)</p>
-</li>
-<li><p>Copy batch-jaxrs.xml to <code>$FEDORA_HOME/server/config/spring/web/jaxrs/</code></p></li>
-<li>
-<p>Add <code>fedora-batch-NNN.jar</code> to your Fedora webapp.</p>
-
-<p>(Tomcat users can copy the fedora-batch jar to <code>$CATALINA_HOME/webapps/fedora/WEB-INF/lib</code>)</p>
 </li>
 </ol><h2>Building from source</h2>
 
@@ -192,12 +188,17 @@ along with fedora-client.  If not, see <a href="http://www.gnu.org/licenses/">ht
 
 <p>Copyright © 2012 MediaShelf</p>
       </section>
-      <footer>
-        <p>Project maintained by <a href="https://github.com/mediashelf">mediashelf</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Fedora-batch maintained by <a href="https://github.com/mediashelf">mediashelf</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
       </footer>
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+
     
+
   </body>
 </html>
