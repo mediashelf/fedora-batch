@@ -26,16 +26,6 @@
       <type>war</type>
     </dependency>
     <dependency>
-      <groupId>org.fcrepo</groupId>
-      <artifactId>fcrepo-installer</artifactId>
-      <classifier>fedora-home</classifier>
-      <type>zip</type>
-    </dependency>
-    <dependency>
-      <groupId>com.yourmediashelf.sandbox</groupId>
-      <artifactId>fedora-cargo</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.yourmediashelf.fedora.client</groupId>
       <artifactId>fedora-client-core</artifactId>
     </dependency>
@@ -53,52 +43,7 @@
     </dependency>
   </dependencies>
   <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*.properties</include>
-        </includes>
-      </testResource>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>false</filtering>
-        <excludes>
-          <exclude>**/*.properties</exclude>
-        </excludes>
-      </testResource>
-    </testResources>
     <plugins>
-      <plugin>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.5.1</version>
-        <executions>
-          <execution>
-            <id>unpack</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.fcrepo</groupId>
-                  <artifactId>fcrepo-installer</artifactId>
-                  <classifier>fedora-home</classifier>
-                  <type>zip</type>
-                  <overWrite>false</overWrite>
-                  <outputDirectory>${fedora.home}</outputDirectory>
-                  <!-- fedora-client doesn't need the client/ directory -->
-                  <excludes>client/**</excludes>
-                </artifactItem>
-              </artifactItems>
-              <overWriteReleases>false</overWriteReleases>
-              <overWriteSnapshots>true</overWriteSnapshots>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <artifactId>maven-war-plugin</artifactId>
         <version>2.2</version>
@@ -112,75 +57,26 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
-        <executions>
-          <execution>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
+        <groupId>com.yourmediashelf.fedora</groupId>
+        <artifactId>fedora-cargo-plugin</artifactId>
+        <version>0.1</version>
         <configuration>
-          <classpathScope>test</classpathScope>
-          <executable>java</executable>
-          <arguments>
-            <argument>-classpath</argument>
-            <classpath />
-            <argument>com.yourmediashelf.fedora.cargo.FedoraHome</argument>
-            <argument>${project.build.testOutputDirectory}/install.properties</argument>
-          </arguments>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.cargo</groupId>
-        <artifactId>cargo-maven2-plugin</artifactId>
-        <version>1.2.4</version>
-        <configuration>
-          <container>
-            <containerId>tomcat7x</containerId>
-            <zipUrlInstaller>
-              <url>https://archive.apache.org/dist/tomcat/tomcat-7/v7.0.29/bin/apache-tomcat-7.0.29.zip</url>
-            </zipUrlInstaller>
-            <log>${project.build.directory}/container.log</log>
-            <systemProperties>
-              <fedora.home>${fedora.home}</fedora.home>
-            </systemProperties>
-          </container>
-          <configuration>
-            <home>${project.build.directory}/tomcat</home>
-            <properties>
-              <cargo.servlet.uriencoding>UTF-8</cargo.servlet.uriencoding>
-              <cargo.servlet.port>${fedora.port}</cargo.servlet.port>
-              <cargo.jvmargs>-XX:MaxPermSize=256M -Xmx512M</cargo.jvmargs>
-            </properties>
-          </configuration>
-          <deployables>
-            <deployable>
-              <groupId>${project.groupId}</groupId>
-              <artifactId>${project.artifactId}</artifactId>
-              <type>war</type>
-              <properties>
-                <context>fedora</context>
-              </properties>
-            </deployable>
-          </deployables>
+          <fcrepo.version>3.6.1-SNAPSHOT</fcrepo.version>
         </configuration>
         <executions>
           <execution>
             <id>start-container</id>
             <phase>pre-integration-test</phase>
             <goals>
-              <goal>start</goal>
+              <goal>fedora-home</goal>
+              <goal>fedora-start</goal>
             </goals>
           </execution>
           <execution>
             <id>stop-container</id>
             <phase>post-integration-test</phase>
             <goals>
-              <goal>stop</goal>
+              <goal>fedora-stop</goal>
             </goals>
           </execution>
         </executions>
@@ -197,13 +93,13 @@
           </execution>
         </executions>
         <configuration>
-           <classpathDependencyExcludes>
-             <classpathDependencyExcludes>org.apache.cxf:cxf-rt-frontend-jaxrs</classpathDependencyExcludes>
-             <classpathDependencyExcludes>org.apache.cxf:cxf-api</classpathDependencyExcludes>
-             <classpathDependencyExcludes>org.fcrepo:fcrepo-server</classpathDependencyExcludes>
-             <classpathDependencyExcludes>org.fcrepo:fcrepo-common</classpathDependencyExcludes>
-             <classpathDependencyExcludes>org.apache.cxf:cxf-api</classpathDependencyExcludes>
-           </classpathDependencyExcludes>
+          <classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.apache.cxf:cxf-rt-frontend-jaxrs</classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.apache.cxf:cxf-api</classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.fcrepo:fcrepo-server</classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.fcrepo:fcrepo-common</classpathDependencyExcludes>
+            <classpathDependencyExcludes>org.apache.cxf:cxf-api</classpathDependencyExcludes>
+          </classpathDependencyExcludes>
           <systemPropertyVariables>
             <test.debug>false</test.debug>
             <test.validate>false</test.validate>
@@ -214,6 +110,5 @@
         </configuration>
       </plugin>
     </plugins>
-
   </build>
 </project>
